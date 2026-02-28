@@ -77,7 +77,7 @@ uploaded_file = st.file_uploader("Télécharge une image dermatologique", type=[
 
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Image chargée", use_column_width=True)
+    st.image(image, caption="Image chargée", width="stretch")
 
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
