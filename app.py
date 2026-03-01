@@ -4,20 +4,17 @@ import torch.nn as nn
 import torchvision.models as models
 from torchvision import transforms
 from PIL import Image
+import os
+import gdown
 
-# -------- CONFIG PAGE --------
 st.set_page_config(
-    page_title="SkinAI",
-    page_icon="🌿",
+    page_title="DermaAI",
     layout="centered"
 )
 
-# -------- STYLE CSS PERSONNALISÉ --------
 st.markdown("""
     <style>
-    .stApp {
-        background-color: #F3FBEF;
-    }
+    .stApp { background-color: #F3FBEF; }
     .main-title {
         font-size: 40px;
         font-weight: bold;
@@ -42,10 +39,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# -------- DEVICE --------
 device = torch.device("cpu")
 
-# -------- MODEL --------
 model = models.resnet18(pretrained=False)
 
 model.fc = nn.Sequential(
@@ -55,7 +50,18 @@ model.fc = nn.Sequential(
     nn.Linear(256, 7)
 )
 
-model.load_state_dict(torch.load("model.pth", map_location=device))
+MODEL_PATH = "model.pth"
+MODEL_URL = "https://drive.google.com/uc?id=1rp3cEm2ymxI7KvOgx8PhQMdH5YIFL9Te"
+
+if not os.path.exists(MODEL_PATH):
+    st.write("Téléchargement du modèle en cours...")
+    gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
+
+if not os.path.exists(MODEL_PATH):
+    st.error("Le modèle n'a pas pu être téléchargé.")
+    st.stop()
+
+model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
 model.to(device)
 model.eval()
 
@@ -69,7 +75,6 @@ classes = [
     "Vascular Lesion"
 ]
 
-# -------- UI --------
 st.markdown('<div class="main-title">DermaScan</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Détection intelligente des lésions cutanées</div>', unsafe_allow_html=True)
 
